@@ -1,3 +1,6 @@
+var gameMode = 'TWO_PLAYER';
+//var gameMode = 'RANDOM_AI';
+
 var cols = 7;
 var rows = 6;
 
@@ -82,24 +85,50 @@ function mouseReleased() {
 	press = !press;
 	if (press && loop) {
 
-		// Changes boards value at the tile the user is hovering:
-		hoverCol = floor((mouseX - windowX) / tileSize);
-		hoverRow = floor((mouseY - windowY) / tileSize);
-		let actualRow = rows - colValues[hoverCol] - 1;
-		if (hoverCol >= 0 && hoverCol < cols &&  actualRow < rows && actualRow >= 0) {
-			if (player) {
-				matrix[actualRow][hoverCol] = 1;
-			} else {
-				matrix[actualRow][hoverCol] = -1;
-			}
-			colValues[hoverCol]++;
-			checkWinner();
+		if (gameMode == 'TWO_PLAYER') {
+			// Changes boards value at the tile the user is hovering:
+			hoverCol = floor((mouseX - windowX) / tileSize);
+			hoverRow = floor((mouseY - windowY) / tileSize);
+			let actualRow = rows - colValues[hoverCol] - 1;
+			if (hoverCol >= 0 && hoverCol < cols &&  actualRow < rows && actualRow >= 0) {
+				if (player) {
+					matrix[actualRow][hoverCol] = 1;
+				} else {
+					matrix[actualRow][hoverCol] = -1;
+				}
+				colValues[hoverCol]++;
+				checkWinner();
 
-			player = !player;
-			//console.log(player);
-			return false;
+				player = !player;
+				return false;
+			}
+		} else if (gameMode == 'RANDOM_AI') {
+			hoverCol = floor((mouseX - windowX) / tileSize);
+			hoverRow = floor((mouseY - windowY) / tileSize);
+			let actualRow = rows - colValues[hoverCol] - 1;
+			if (hoverCol >= 0 && hoverCol < cols &&  actualRow < rows && actualRow >= 0) {
+				matrix[actualRow][hoverCol] = 1;
+				colValues[hoverCol]++;
+				
+				if (checkWinner()) {
+					return false;
+				}
+
+				// random ai's turn:
+				while(true) {
+					let randomCol = floor(random() * cols);
+					let actualRow = rows - colValues[randomCol] - 1;
+					if (actualRow < rows && actualRow >= 0) {
+						matrix[actualRow][randomCol] = -1;
+						colValues[randomCol]++;
+						break;
+					}
+				}
+				checkWinner();
+				return false;
+			}
+			
 		}
-		//ellipse(windowX + hoverCol * tileSize, windowY + hoverRow * tileSize, tileSize);
 
 	}
 }
@@ -122,6 +151,7 @@ function checkWinner() {
 				console.log('Winner: ' + p);
 				loop = false;
 				drawMatrix();
+				return true;
 			}
 		}
 	}
@@ -142,6 +172,7 @@ function checkWinner() {
 				console.log('Winner: ' + p);
 				loop = false;
 				drawMatrix();
+				return true;
 			}
 		}
 	}
@@ -159,6 +190,7 @@ function checkWinner() {
 				console.log('Winner: ' + first);
 				loop = false;
 				drawMatrix();
+				return true;
 			}
 		}
 	}
@@ -176,6 +208,7 @@ function checkWinner() {
 				console.log('Winner: ' + first);
 				loop = false;
 				drawMatrix();
+				return true;
 			}
 		}
 	}
